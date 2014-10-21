@@ -31,12 +31,11 @@ echo "Repo........: $REPO"
 echo "************************"
 
 # Clone source code repository
+mkdir -p $SOURCES
+mkdir -p $OUTPUTS
+cd $SOURCES
 
-
-mkdir -p $WORKDIR/output
-cd $WORKDIR
-
-git clone $REPO $WORKDIR
+git clone $REPO $SOURCES
 if [ $? -ne 0 ]; then
   echo "Error cloning repository $REPO"
   exit $?
@@ -55,5 +54,17 @@ if [ $? -ne 0 ]; then
   exit $?
 fi
 
+cp $SOURCES/Dockerfile.runtime $OUTPUTS/Dockerfile
+cd $OUTPUTS
+
+sudo docker build -t $USERID/$REPOSITORY:$VERSION .
+
+sudo docker tag $USERID/$REPOSITORY:$VERSION $USERID/$REPOSITORY:latest
+
+sudo docker push $USERID/$REPOSITORY:$VERSION
+
+sudo docker push $USERID/$REPOSITORY:latest
+
+echo "Redy!"
 
 
